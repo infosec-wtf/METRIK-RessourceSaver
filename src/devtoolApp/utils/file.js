@@ -1,8 +1,5 @@
-import prettier from 'prettier';
-import htmlParser from 'prettier/parser-html';
-import babelParser from 'prettier/parser-babel';
-import postCssParser from 'prettier/parser-postcss';
 import * as zip from '@zip.js/zip.js';
+import { isValidBase64 } from './encoding';
 
 export const resolveDuplicatedResources = (resourceList = []) => {
   const resolvedListByKey = {};
@@ -61,8 +58,8 @@ export const downloadZipFile = (toDownload, options, eachDoneCallback, callback)
 
 // Create a reader of the content for zip
 export const getContentRead = (item) => {
-  if (item.encoding === 'base64') {
-    return new zip.Data64URIReader(item.content || 'No Content: ' + item.url);
+  if (item.encoding === 'base64' && isValidBase64(item.content)) {
+    return new zip.Data64URIReader(item.content);
   }
   if (item.content instanceof Blob) {
     return new zip.BlobReader(item.content);
@@ -76,51 +73,10 @@ export const addItemsToZipWriter = (zipWriter, items, options, eachDoneCallback,
 
   // if item exist so add it to zip
   if (item) {
-    // Beautify here
-    if (options?.beautifyFile && !item.encoding && !!item.content) {
-      try {
-        const fileExt = item.saveAs?.name?.match(/\.([0-9a-z]+)(?:[\?#]|$)/);
-        switch (fileExt ? fileExt[1] : '') {
-          case 'js': {
-            console.log('[DEVTOOL]', item.saveAs?.name, ' will be beautified!');
-            item.content = prettier.format(item.content, { parser: 'babel', plugins: [babelParser] });
-            break;
-          }
-          case 'json': {
-            console.log('[DEVTOOL]', item.saveAs?.name, ' will be beautified!');
-            item.content = prettier.format(item.content, { parser: 'json', plugins: [babelParser] });
-            break;
-          }
-          case 'html': {
-            console.log('[DEVTOOL]', item.saveAs?.name, ' will be beautified!');
-            item.content = prettier.format(item.content, { parser: 'html', plugins: [htmlParser, babelParser, postCssParser] });
-            break;
-          }
-          case 'css': {
-            console.log('[DEVTOOL]', item.saveAs?.name, ' will be beautified!');
-            item.content = prettier.format(item.content, { parser: 'css', plugins: [postCssParser] });
-            break;
-          }
-        }
-      } catch (err) {
-        console.log('[DEVTOOL]', 'Cannot format file', item, err);
-      }
-    }
-
-    // Check whether base64 encoding is valid
-    if (item.encoding === 'base64') {
-      // Try to decode first
-      try {
-        atob(item.content);
-      } catch (err) {
-        console.log('[DEVTOOL]', item.url, ' is not base64 encoding, try to encode to base64.');
-        try {
-          item.content = btoa(item.content);
-        } catch (err) {
-          console.log('[DEVTOOL]', item.url, ' failed to encode to base64, fallback to text.');
-          item.encoding = null;
-        }
-      }
+    // Base64 content that fails strict validation is not passed to
+    // Data64URIReader (see getContentRead); it falls back to TextReader.
+    if (item.encoding === 'base64' && !isValidBase64(item.content)) {
+      console.log('[DEVTOOL]', item.url, ' is not valid base64 encoding, fallback to text.');
     }
 
     // Create a reader of the content for zip

@@ -15,7 +15,7 @@ export const useAppSaveAllResource = () => {
   const staticResourceRef = useRef(staticResource);
   const {
     downloadList,
-    option: { ignoreNoContentFile, beautifyFile },
+    option: { ignoreNoContentFile },
     ui: { tab },
   } = state;
 
@@ -64,7 +64,7 @@ export const useAppSaveAllResource = () => {
         if (loaded && toDownload.length) {
           downloadZipFile(
             toDownload,
-            { ignoreNoContentFile, beautifyFile },
+            { ignoreNoContentFile },
             (item, isDone) => {
               dispatch(uiActions.setStatus(`Compressed: ${item.url} Processed: ${isDone}`));
             },

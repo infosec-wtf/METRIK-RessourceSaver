@@ -17,8 +17,7 @@
     "reset": "yarn clean && rm -rf ./.cache && rm -rf ./.parcel-cache",
     "local": "rm -rf ./node_modules/parcel-plugin-local && yarn install --check-files && yarn reset",
     "auto": "rm -rf output && babel-node auto.js --presets @babel/preset-env",
-    "test": "node --test 'src/**/*.test.mjs'",
-    "prettier": "yarn prettier"
+    "test": "node --test 'src/**/*.test.mjs'"
   },
   "alias": {
     "devtoolApp": "./src/devtoolApp",
@@ -32,7 +31,6 @@
     "@zip.js/zip.js": "^2.6.26",
     "lodash": "^4.17.21",
     "polished": "^4.2.2",
-    "prettier": "^2.7.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.4.0",
