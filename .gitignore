@@ -1,23 +1,20 @@
-# Modules
-node_modules
-bower_components
-test/bower_components
+# Dependencies / build
+node_modules/
+dist/
+.parcel-cache/
+*.crx
+*.zip
 
-# Misc
-.tmp
+# Env / local
+.env
+.env.*
+*.local.*
+
+# Claude / planning artifacts — NEVER push
+.claude/
+CLAUDE.md
+.superpowers/
+docs/superpowers/
+
+# OS / editor
 .DS_Store
-*.log
-
-# Distribution
-dist
-output
-
-# Parcel
-.cache
-.parcel-cache
-
-# IDE
-.idea
-
-# Distribution
-unpacked2x/*.zip
