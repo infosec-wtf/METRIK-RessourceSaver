@@ -1,7 +1,12 @@
 # Dependencies / build
 node_modules/
 dist/
+# Parcel build output dirs (build artifacts must not be committed)
+unpacked2x/
+unpacked1x/
 .parcel-cache/
+.cache/
+output/
 *.crx
 *.zip
 
