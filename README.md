@@ -51,6 +51,12 @@ Tests: `yarn test` (runs `node --test 'src/**/*.test.mjs'`).
 
 ## Credits
 
-Original author: [up209d](https://github.com/up209d). If you find the tool
-useful, consider supporting the original author via the link in the upstream
-repository.
+This project is a fork of **[ResourcesSaverExt](https://github.com/up209d/ResourcesSaverExt)**
+by **[up209d](https://github.com/up209d)**, the original author of the program.
+All credit for the original tool goes to them.
+
+If you find it useful, please support the original author:
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/up209d)
+
+☕ https://www.buymeacoffee.com/up209d
