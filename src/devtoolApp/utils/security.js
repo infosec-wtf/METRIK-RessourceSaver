@@ -20,9 +20,18 @@ export const isPrivateHost = (hostname) => {
   // Strip IPv6 brackets.
   if (host.startsWith('[') && host.endsWith(']')) host = host.slice(1, -1);
 
+  // IPv6 literals always contain a colon; hostnames never do. Keep the two
+  // rule sets fully separate so IPv6-prefix checks can never fire against a
+  // hostname (e.g. "fd-cdn.example.com", "fconline.example.com").
+  if (host.includes(':')) {
+    if (host === '::1' || host === '::') return true; // loopback / unspecified
+    if (host.startsWith('::ffff:')) return true; // IPv4-mapped IPv6 — treat like the mapped IPv4 address
+    if (host.startsWith('fe8') || host.startsWith('fe9') || host.startsWith('fea') || host.startsWith('feb')) return true; // fe80::/10 link-local
+    if (host.startsWith('fc') || host.startsWith('fd')) return true; // fc00::/7 unique-local
+    return false; // other IPv6 (global unicast) is allowed
+  }
+
   if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local')) return true;
-  // IPv6 loopback and unique-local / link-local ranges (::1, fc00::/7, fe80::/10).
-  if (host === '::1' || host.startsWith('fc') || host.startsWith('fd') || host.startsWith('fe80')) return true;
 
   const v4 = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
   if (v4) {

@@ -31,6 +31,28 @@ test('isSafeRetryFetchUrl blocks internal/private and non-http targets (SSRF)', 
   }
 });
 
+test('isSafeRetryFetchUrl blocks IPv4-mapped IPv6 and other IPv6-literal private ranges (SSRF)', () => {
+  for (const u of [
+    'http://[::ffff:169.254.169.254]/', // IPv4-mapped cloud metadata
+    'http://[::ffff:127.0.0.1]/', // IPv4-mapped loopback
+    'http://[fe80::1]/', // link-local
+    'http://[fc00::1]/', // unique-local
+    'http://[::1]/', // loopback
+  ]) {
+    assert.equal(isSafeRetryFetchUrl(u), false, `should block ${u}`);
+  }
+});
+
+test('isSafeRetryFetchUrl does not over-block hostnames that merely resemble IPv6 prefixes', () => {
+  for (const u of [
+    'http://fd-cdn.example.com/a.js',
+    'http://fconline.example.com/',
+    'http://[2606:4700:4700::1111]/', // real public IPv6 (Cloudflare)
+  ]) {
+    assert.equal(isSafeRetryFetchUrl(u), true, `should allow ${u}`);
+  }
+});
+
 test('isNavigableHttpUrl only accepts real http(s) URLs', () => {
   assert.equal(isNavigableHttpUrl('https://example.com/page'), true);
   assert.equal(isNavigableHttpUrl('http://example.com/'), true);
