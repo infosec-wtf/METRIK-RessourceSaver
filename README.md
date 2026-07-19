@@ -1,57 +1,56 @@
-# Resources Saver Extension (Chrome)
+# Save All Resources (METRIK RessourceSaver)
 
-### Chrome Extension for one click downloading all resources files and keeping folder structures.
+Chrome MV3 **DevTools extension** that downloads every resource of the inspected
+page in one click, keeping the original folder structure, and saves it as a ZIP.
 
----
+> Fork of [up209d/ResourcesSaverExt](https://github.com/up209d/ResourcesSaverExt),
+> modernized and security-hardened. Licensed under GPL-3.0 (see `LICENSE`).
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/up209d)
+## How to use
 
-### How to use:
-
-Load extension from `unpacked2x` folder as local package.
-
-`Chrome > Extensions > Manage Extensions`
-
-<p>
-    <img src="https://github.com/up209d/ResourcesSaverExt/blob/master/guide.png?raw=true" alt="load-local-extension" />
-</p>
-
-Click `Load unpacked` button and select the `unpacked2x` directory
-
-<p>
-    <img src="https://github.com/up209d/ResourcesSaverExt/blob/master/select-unpacked2x-directory.png?raw=true" alt="select-unpacked2x-directory" />
-</p>
-
-Open Chrome `DevTool` Panel > Choose `ResourceSaver` Tab
-
-<p>
-    <img src="https://github.com/up209d/ResourcesSaverExt/blob/master/screenshot.png?raw=true" alt="resource-saver-dev-tool-panel" />
-</p>
-
-Saved website will have same structure as in remote server, you can use any http server tool to host the web content again eg. [http-server](https://github.com/http-party/http-server)
-
-<p>
-    <img src="https://github.com/up209d/ResourcesSaverExt/blob/master/screenshot2.png?raw=true" alt="resource-saver-dev-tool-panel" />
-</p>
+1. Build the extension (see below) — output goes to `unpacked2x/`.
+2. Chrome → `Extensions` → enable **Developer mode** → **Load unpacked** →
+   select the `unpacked2x/` directory.
+3. Open **DevTools** on any page → **ResourcesSaver** tab → **Save all resources**.
+4. The saved site mirrors the remote folder structure; serve it again with any
+   static server (e.g. [http-server](https://github.com/http-party/http-server)).
 
 ## Development
 
-### Requirement
+Requirements: Node (see `.nvmrc`, currently 22) and Yarn (via `corepack enable`).
 
-Make sure your Node.js version match with version in `.nvmrc`
-
-Install `yarn`
-
-### Install dependencies
-
-```
-yarn
+```bash
+corepack enable        # provides yarn
+yarn install           # install dependencies
+yarn build             # production build -> unpacked2x/
+yarn dev               # watch build for development
+yarn test              # run unit tests (node:test)
 ```
 
-### Build
+Build output (`unpacked2x/`, `dist/`) and local/planning files are gitignored and
+must not be committed.
 
-```
-yarn build
-```
+## Security & architecture notes
 
-Project will be built output to `unpacked2x`
+This fork removed the legacy 0.1.x panels and the in-page "beautify" feature and
+hardened the resource-handling code:
+
+- **No legacy panels / version switcher** — the modern React panel is always
+  loaded. This removed a DOM-XSS sink that ran in the privileged extension origin.
+- **Path-traversal / Zip-Slip safe** — resource URLs are decoded first, then the
+  save path is rebuilt segment-by-segment, dropping `.`/`..`
+  (`src/devtoolApp/utils/url.js`, covered by tests).
+- **Retry-fetch hardened** — the automatic content re-fetch is restricted to
+  public http(s) hosts (private/loopback/link-local blocked) and uses
+  `credentials: 'omit'` (`src/devtoolApp/utils/security.js`).
+- **Minimal permissions** — only `tabs`; explicit `content_security_policy`.
+- **No `prettier` in the client bundle** — the beautify feature was removed,
+  shrinking the panel bundle substantially and removing a main-thread DoS vector.
+
+Tests: `yarn test` (runs `node --test 'src/**/*.test.mjs'`).
+
+## Credits
+
+Original author: [up209d](https://github.com/up209d). If you find the tool
+useful, consider supporting the original author via the link in the upstream
+repository.
