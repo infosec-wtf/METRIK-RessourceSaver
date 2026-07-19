@@ -25,7 +25,14 @@ export const Header = (props) => {
   return (
     <HeaderWrapper>
       <div>
-        <span>Resources Saver</span>
+        <a
+          href="https://github.com/infosec-wtf/METRIK-RessourceSaver"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: 'inherit', textDecoration: 'none' }}
+        >
+          Metrik Ressource Saver
+        </a>
         <sup>Version: {packageJson?.version || 'LOCAL'}</sup>
         <ResetButton color={props.theme.white} bgColor={props.theme.danger} />
       </div>

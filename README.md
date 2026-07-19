@@ -1,4 +1,4 @@
-# Save All Resources (METRIK RessourceSaver)
+# Metrik Ressource Saver
 
 Chrome MV3 **DevTools extension** that downloads every resource of the inspected
 page in one click, keeping the original folder structure, and saves it as a ZIP.
@@ -11,7 +11,7 @@ page in one click, keeping the original folder structure, and saves it as a ZIP.
 1. Build the extension (see below) — output goes to `unpacked2x/`.
 2. Chrome → `Extensions` → enable **Developer mode** → **Load unpacked** →
    select the `unpacked2x/` directory.
-3. Open **DevTools** on any page → **ResourcesSaver** tab → **Save all resources**.
+3. Open **DevTools** on any page → **Metrik Ressource Saver** tab → **Save all resources**.
 4. The saved site mirrors the remote folder structure; serve it again with any
    static server (e.g. [http-server](https://github.com/http-party/http-server)).
 

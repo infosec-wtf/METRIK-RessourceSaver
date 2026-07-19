@@ -1,15 +1,15 @@
 {
-  "name": "Save All Resources",
+  "name": "Metrik Ressource Saver",
   "version": "2.0.6",
   "description": "Save all resources files with retaining folder structure.",
   "author": "up209d",
-  "homepage_url": "https://github.com/up209d/ResourcesSaverExt",
+  "homepage_url": "https://github.com/infosec-wtf/METRIK-RessourceSaver",
   "icons": {
     "128": "icon.png"
   },
   "action": {
     "default_icon": "icon.png",
-    "default_title": "Save All Resources",
+    "default_title": "Metrik Ressource Saver",
     "default_popup": "popup.html"
   },
   "background": {

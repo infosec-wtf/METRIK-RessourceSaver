@@ -1,3 +1,3 @@
-chrome.devtools.panels.create('ResourcesSaver', 'icon.png', 'devtool.app.html', () => {
+chrome.devtools.panels.create('Metrik Ressource Saver', 'icon.png', 'devtool.app.html', () => {
   // Panel loaded — always the modern React app.
 });
