@@ -17,6 +17,7 @@
     "reset": "yarn clean && rm -rf ./.cache && rm -rf ./.parcel-cache",
     "local": "rm -rf ./node_modules/parcel-plugin-local && yarn install --check-files && yarn reset",
     "auto": "rm -rf output && babel-node auto.js --presets @babel/preset-env",
+    "test": "node --test 'src/**/*.test.mjs'",
     "prettier": "yarn prettier"
   },
   "alias": {
@@ -29,9 +30,6 @@
   ],
   "dependencies": {
     "@zip.js/zip.js": "^2.6.26",
-    "app": "^0.1.0",
-    "context": "^3.0.4",
-    "global": "^4.4.0",
     "lodash": "^4.17.21",
     "polished": "^4.2.2",
     "prettier": "^2.7.1",

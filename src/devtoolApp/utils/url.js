@@ -101,34 +101,41 @@ export const resolveURLToPath = (cUrl, cType, cContent) => {
         filename = filename + '.' + haveExtension;
     }
 
-    // Remove path violation case
-    filepath = filepath
-        .replace(/:|\\|=|\*|\.$|"|'|\?|~|\||<|>/g, '')
-        .replace(/\/\//g, '/')
-        .replace(/(\s|\.)\//g, '/')
-        .replace(/\/(\s|\.)/g, '/');
-
-    filename = filename.replace(/:|\\|=|\*|\.$|"|'|\?|~|\||<|>/g, '');
-
-    // Decode URI
-    if (filepath.indexOf('%') !== -1) {
+    // Decode percent-encoding FIRST. This must happen before any traversal
+    // sanitization, otherwise encoded sequences (e.g. %2e%2e -> "..", %2f -> "/",
+    // %5c -> "\") slip past the checks below and re-appear in the final path.
+    const safeDecode = (value) => {
+        if (value.indexOf('%') === -1) return value;
         try {
-            filepath = decodeURIComponent(filepath);
-            filename = decodeURIComponent(filename);
+            return decodeURIComponent(value);
         } catch (err) {
             console.log('[DEVTOOL]', err);
+            return value;
         }
-    }
+    };
+    filepath = safeDecode(filepath);
+    filename = safeDecode(filename);
 
-    // Strip double slashes ---
-    while (filepath.includes('//')) {
-        filepath = filepath.replace('//', '/');
-    }
+    // Normalize Windows-style separators so backslash traversal is handled too.
+    filepath = filepath.replace(/\\/g, '/');
 
-    // Strip the first slash '/src/...' -> 'src/...'
-    if (filepath.charAt(0) === '/') {
-        filepath = filepath.slice(1);
-    }
+    // Strip characters that are illegal or dangerous in file paths.
+    const stripIllegal = (value) => value.replace(/[:\\=*"'?~|<>]/g, '');
+    filepath = stripIllegal(filepath);
+
+    // Rebuild the path from its segments, dropping "" (collapses //, strips a
+    // leading slash), "." and ".." segments. Dropping ".." rather than resolving
+    // it guarantees the result can NEVER escape the extraction root when the ZIP
+    // is unpacked, which defeats Zip-Slip / path traversal. Trailing dots and
+    // spaces are trimmed per segment (illegal on Windows).
+    filepath = filepath
+        .split('/')
+        .map((seg) => seg.replace(/[\s.]+$/, ''))
+        .filter((seg) => seg !== '' && seg !== '.' && seg !== '..')
+        .join('/');
+
+    // Keep filename consistent with the sanitized path (its last segment).
+    filename = filepath.substring(filepath.lastIndexOf('/') + 1);
 
     //  console.log('Save to: ', filepath);
     //  console.log('File name: ',filename);

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import * as uiActions from '../store/ui';
 import { downloadZipFile, resolveDuplicatedResources } from '../utils/file';
 import { logResourceByUrl } from '../utils/resource';
+import { isNavigableHttpUrl } from '../utils/security';
 import { resetNetworkResource } from '../store/networkResource';
 import { resetStaticResource } from '../store/staticResource';
 import { INITIAL_STATE as UI_INITIAL_STATE } from '../store/ui';
@@ -25,7 +26,12 @@ export const useAppSaveAllResource = () => {
       dispatch(uiActions.setSavingIndex(i));
       await new Promise(async (resolve) => {
         let loaded = true;
-        if (i > 0 || tab?.url !== downloadItem.url) {
+        if ((i > 0 || tab?.url !== downloadItem.url) && !isNavigableHttpUrl(downloadItem.url)) {
+          // Refuse to navigate the inspected tab to anything but a real http(s)
+          // URL (blocks javascript:/data:/file: and "httpx://"). See AUDIT #9.
+          console.warn('[DEVTOOL] Skipping non-navigable URL:', downloadItem.url);
+          loaded = false;
+        } else if (i > 0 || tab?.url !== downloadItem.url) {
           loaded = await new Promise((r) => {
             const tabChangeHandler = (tabId, changeInfo) => {
               if (tabId !== chrome.devtools.inspectedWindow.tabId || !changeInfo || !changeInfo.status) {

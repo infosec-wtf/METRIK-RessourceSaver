@@ -2,6 +2,7 @@ import * as networkResourceActions from 'devtoolApp/store/networkResource';
 import * as staticResourceActions from 'devtoolApp/store/staticResource';
 import { flashStatus } from 'devtoolApp/store/ui';
 import { resolveURLToPath } from './url';
+import { isSafeRetryFetchUrl } from './security';
 import { debounce, logIfDev } from './general';
 import * as downloadLogActions from '../store/downloadLog';
 
@@ -65,9 +66,12 @@ export const processStaticResourceToStore = (dispatch, res) => {
           meta.failed = true;
         }
       }
-      if (!meta.content && res.url.startsWith('http')) {
+      if (!meta.content && isSafeRetryFetchUrl(res.url)) {
+        // Only auto-fetch public http(s) targets. Internal/private hosts are
+        // blocked to prevent SSRF (see SECURITY-AUDIT.md #3); credentials:'omit'
+        // ensures no ambient cookies are sent cross-origin.
         console.debug(`[STATIC] ${res.url} No content from memory, try to fetch content directly: `, res.url);
-        fetch(res.url)
+        fetch(res.url, { credentials: 'omit' })
           .then(async (retryRequest) => {
             if (retryRequest.ok) {
               meta.content = await retryRequest.blob();

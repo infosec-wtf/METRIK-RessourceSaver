@@ -19,6 +19,9 @@
   "permissions": ["tabs", "downloads", "downloads.shelf"],
   "host_permissions": ["http://*/", "https://*/"],
   "optional_host_permissions": ["*://*/*"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; base-uri 'none'"
+  },
   "devtools_page": "devtool.html",
   "manifest_version": 3
 }
