@@ -16,7 +16,7 @@
     "service_worker": "background.js",
     "type": "module"
   },
-  "permissions": ["tabs", "downloads", "downloads.shelf"],
+  "permissions": ["tabs"],
   "host_permissions": ["http://*/", "https://*/"],
   "optional_host_permissions": ["*://*/*"],
   "content_security_policy": {
